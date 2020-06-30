@@ -8,7 +8,7 @@ class Icon extends Phaser.GameObjects.Image{
         this.setInteractive();
         this.setScale(0.25);
 
-        highlight.setStrokeStyle(10, 0xFFFFFF);
+        highlight.setStrokeStyle(5, 0xFFFFFF);
         highlight.setVisible(false);
 
         this.on(Phaser.Input.Events.POINTER_DOWN, function() {
@@ -16,10 +16,17 @@ class Icon extends Phaser.GameObjects.Image{
             highlight.setPosition(x,y);
             highlight.setVisible(true);
             if(click >= 2){
-                console.log(texture);
                 wnd.setVisible(true);
-                topWnd++;
-                wnd.setDepth(topWnd);
+                wnd.parentContainer.bringToTop(wnd);
+                for(let i = 0; i < wnd.parentContainer.getAll().length; i++){
+                    if(i === wnd.parentContainer.getAll().length - 1){
+                        let len = wnd.parentContainer.getAt(i).getAll().length;
+                        wnd.parentContainer.getAt(i).getAt(len - 2).setVisible(false);
+                    }else{
+                        let len = wnd.parentContainer.getAt(i).getAll().length;
+                        wnd.parentContainer.getAt(i).getAt(len - 2).setVisible(true); 
+                    }
+                }
                 highlight.setVisible(false);
             }
             this.doubleClickTimer();
@@ -34,23 +41,15 @@ class Icon extends Phaser.GameObjects.Image{
 }
 
 class Wnd extends Phaser.GameObjects.Container{
-    constructor(scene:Scene, x:number, y:number){
+    constructor(scene:Scene, x:number, y:number, title:string){
         super(scene, x, y);
         scene.add.existing(this);
         let windBG = scene.add.image(0,0,'windBG');
         windBG.setInteractive();
         this.add(windBG);
         this.setScale(1.5);
-        // this.setVisible(false);
+        this.setVisible(false);
         this.setSize(windBG.width, windBG.height);
-        // this.setInteractive();
-        // scene.input.setHitArea(this.getAll()).on('pointerdown', function(i){
-        //     // console.log(i);
-        //     i.event.stopPropagation();
-        //     topWnd++;
-        //     this.setVisible(false);
-        //     console.log(this);
-        // },this);
 
         
 
@@ -58,10 +57,13 @@ class Wnd extends Phaser.GameObjects.Container{
         bar.setInteractive();
         this.add(bar);
         bar.on(Phaser.Input.Events.POINTER_DOWN, function(e){
-            this.setPosition(this.x + 10, this.y + 10);
+            this.setInteractive({draggable: true});
+            // scene.setDraggable(this);
             console.log(e);
         },this);
 
+        let wndTitle = scene.add.text(-300, -215, title, { fontFamily: 'Helvetica', fontSize: '28px' });
+        this.add(wndTitle);
         
 
         let clickArea = new Phaser.GameObjects.Rectangle(scene,0,0, windBG.width, windBG.height);
@@ -69,10 +71,7 @@ class Wnd extends Phaser.GameObjects.Container{
         this.add(clickArea);
         clickArea.on(Phaser.Input.Events.POINTER_DOWN, function(){
             this.parentContainer.bringToTop(this);
-            topWnd++;
-            // console.log(this.parentContainer.getAll());
             for(let i = 0; i < this.parentContainer.getAll().length; i++){
-                // console.log(this.parentContainer.getAt(i));
                 if(i === this.parentContainer.getAll().length - 1){
                     let len = this.parentContainer.getAt(i).getAll().length;
                     this.parentContainer.getAt(i).getAt(len - 2).setVisible(false);
@@ -118,12 +117,19 @@ class Scene extends Phaser.Scene {
 
         let windows = this.add.container(0,0);
 
-        let chatWnd = new Wnd(this,800,500);
-        let folderWnd = new Wnd(this,850,450);
+        let chatWnd = new Wnd(this, 800, 500, "Chat With Me");
+        let folderWnd = new Wnd(this, 850, 450, "File Explorer");
         
         windows.add([chatWnd, folderWnd]);
         let chat:Icon = new Icon(this, 100, 100,'chat', highlight, chatWnd);
         let folder:Icon = new Icon(this, 100, 300, 'folder', highlight, folderWnd);
+
+        this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
+
+            gameObject.x = dragX;
+            gameObject.y = dragY;
+    
+        });
 
     }
 }
@@ -145,8 +151,4 @@ window.addEventListener('load', (event) => {
     };
 
     let game = new Phaser.Game(config);
-
-
-    
-
 });
