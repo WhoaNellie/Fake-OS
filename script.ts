@@ -1,5 +1,7 @@
 let click = 0;
 let topWnd = 0;
+let draggedItem;
+
 
 class Icon extends Phaser.GameObjects.Image{
     constructor(scene:Scene, x:number, y:number, texture:string, highlight:Phaser.GameObjects.Rectangle, wnd){
@@ -57,9 +59,8 @@ class Wnd extends Phaser.GameObjects.Container{
         bar.setInteractive();
         this.add(bar);
         bar.on(Phaser.Input.Events.POINTER_DOWN, function(e){
-            this.setInteractive({draggable: true});
-            // scene.setDraggable(this);
-            console.log(e);
+            draggedItem = this;
+            console.log(title);
         },this);
 
         let wndTitle = scene.add.text(-300, -215, title, { fontFamily: 'Helvetica', fontSize: '28px' });
@@ -124,13 +125,16 @@ class Scene extends Phaser.Scene {
         let chat:Icon = new Icon(this, 100, 100,'chat', highlight, chatWnd);
         let folder:Icon = new Icon(this, 100, 300, 'folder', highlight, folderWnd);
 
-        this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
+        this.input.on('pointermove', function(e){
+            if(draggedItem){
+                console.log(e)
+                draggedItem.setPosition(draggedItem.x + e.position.x - e.prevPosition.x, draggedItem.y + e.position.y - e.prevPosition.y);
 
-            gameObject.x = dragX;
-            gameObject.y = dragY;
-    
-        });
-
+                this.input.on(Phaser.Input.Events.POINTER_UP, function(){
+                    draggedItem = null;
+                }, this)
+            }
+        },this)
     }
 }
 
