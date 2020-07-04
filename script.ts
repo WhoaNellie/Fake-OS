@@ -91,6 +91,26 @@ class Wnd extends Phaser.GameObjects.Container{
     zInd = 0;
 }
 
+class Bubble extends Phaser.GameObjects.Container{
+    constructor(scene:Scene, x:number, y:number, texture:string, msg:string){
+        super(scene, x, y);
+        scene.add.existing(this);
+
+        let bubble = scene.add.image(x,y,texture);
+        this.add(bubble);
+
+        let msgX;
+        if(texture === 'left'){
+            msgX = -180;
+        }else{
+            msgX = 0;
+        }
+
+        let chatMsg = scene.add.text(msgX, 0, msg, { fontFamily: 'Helvetica', fontSize: '40px' });
+        this.add(chatMsg);
+    }
+}
+
 class Scene extends Phaser.Scene {
     preload(){
         this.load.image('hills', '../assets/grassy-hills.jpg');
@@ -115,19 +135,27 @@ class Scene extends Phaser.Scene {
 
         let windows = this.add.container(0,0);
         windows.setDepth(1);
-        console.log(chatsArr);
-
         let chatWnd = new Wnd(this, 800, 500, "Chat With Me");
         let folderWnd = new Wnd(this, 850, 450, "File Explorer");
 
-        let chats = this.add.container(600,400);
+        let chats = this.add.container(600,800);
         let chatsObjs = [];
         let left = this.add.image(0,0,'left');
         let right = this.add.image(100, 200, 'right');
-        // for(let i = 0; i < chatsArr.length; i++){
-        //     console.log(chatsArr[i].msg)
-        // }
-        chats.add([left,right]);
+        for(let i = chatsArr.length - 1; i > 0; i--){
+            let y = 100 - (100 * (chatsArr.length - i));
+            let x;
+            let texture;
+            if(chatsArr[i].from === "you"){
+                x = 200;
+                texture = 'right';
+            }else{
+                x = 0;
+                texture = 'left';
+            }
+            let chat = new Bubble(this,x, y, texture, chatsArr[i].msg);
+            chats.add(chat);
+        }
         chats.setScale(0.85);
         
         windows.add([chatWnd, folderWnd]);
