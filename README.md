@@ -1,9 +1,9 @@
 # Fake-OS
 Fake OS game framework
 
-* make windows draggable
 * handle text input
 * element selector?
 * file structure
+* scroll
 * render chat from json
 * resize windows?

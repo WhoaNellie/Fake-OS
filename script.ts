@@ -1,7 +1,6 @@
 let click = 0;
-let topWnd = 0;
 let draggedItem;
-
+import chatsArr from './chats.js';
 
 class Icon extends Phaser.GameObjects.Image{
     constructor(scene:Scene, x:number, y:number, texture:string, highlight:Phaser.GameObjects.Rectangle, wnd){
@@ -43,7 +42,7 @@ class Icon extends Phaser.GameObjects.Image{
 }
 
 class Wnd extends Phaser.GameObjects.Container{
-    constructor(scene:Scene, x:number, y:number, title:string){
+    constructor(scene:Scene, x:number, y:number, title:string, content?:Phaser.GameObjects.Container){
         super(scene, x, y);
         scene.add.existing(this);
         let windBG = scene.add.image(0,0,'windBG');
@@ -53,21 +52,18 @@ class Wnd extends Phaser.GameObjects.Container{
         this.setVisible(false);
         this.setSize(windBG.width, windBG.height);
 
-        
-
         let bar = scene.add.image(0,-200, 'bar');
         bar.setInteractive();
         this.add(bar);
         bar.on(Phaser.Input.Events.POINTER_DOWN, function(e){
             draggedItem = this;
-            console.log(title);
         },this);
 
         let wndTitle = scene.add.text(-300, -215, title, { fontFamily: 'Helvetica', fontSize: '28px' });
         this.add(wndTitle);
         
 
-        let clickArea = new Phaser.GameObjects.Rectangle(scene,0,0, windBG.width, windBG.height);
+        let clickArea = new Phaser.GameObjects.Rectangle(scene,0,0, windBG.width, windBG.height, 0x707070,99);
         clickArea.setInteractive();
         this.add(clickArea);
         clickArea.on(Phaser.Input.Events.POINTER_DOWN, function(){
@@ -103,6 +99,8 @@ class Scene extends Phaser.Scene {
         this.load.image('windBG', '../assets/window.png');
         this.load.image('close', '../assets/x.png');
         this.load.image('bar', '../assets/bar.png');
+        this.load.image('left', '../assets/left-full.png');
+        this.load.image('right', '../assets/right-full.png');
     }
 
     create(){
@@ -110,16 +108,27 @@ class Scene extends Phaser.Scene {
         background.setScale(2);
         background.setInteractive();
         background.on(Phaser.Input.Events.POINTER_DOWN, function(){
-            console.log('blick')
             highlight.setVisible(false);
         }, this);
 
         let highlight:Phaser.GameObjects.Rectangle = this.add.rectangle(0, 0, 200, 200);
 
         let windows = this.add.container(0,0);
+        windows.setDepth(1);
+        console.log(chatsArr);
 
         let chatWnd = new Wnd(this, 800, 500, "Chat With Me");
         let folderWnd = new Wnd(this, 850, 450, "File Explorer");
+
+        let chats = this.add.container(600,400);
+        let chatsObjs = [];
+        let left = this.add.image(0,0,'left');
+        let right = this.add.image(100, 200, 'right');
+        // for(let i = 0; i < chatsArr.length; i++){
+        //     console.log(chatsArr[i].msg)
+        // }
+        chats.add([left,right]);
+        chats.setScale(0.85);
         
         windows.add([chatWnd, folderWnd]);
         let chat:Icon = new Icon(this, 100, 100,'chat', highlight, chatWnd);
@@ -127,7 +136,6 @@ class Scene extends Phaser.Scene {
 
         this.input.on('pointermove', function(e){
             if(draggedItem){
-                console.log(e)
                 draggedItem.setPosition(draggedItem.x + e.position.x - e.prevPosition.x, draggedItem.y + e.position.y - e.prevPosition.y);
 
                 this.input.on(Phaser.Input.Events.POINTER_UP, function(){

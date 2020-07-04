@@ -9,10 +9,10 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.ts|\.js$/,
+                test: /\.ts|\.js/,
                 loader: 'ts-loader',
                 exclude: /node_modules/
-            }
+            },
         ]
     },
     devServer: {
@@ -22,6 +22,6 @@ module.exports = {
         port: 8000
     },
     resolve: {
-        extensions: ['.ts', '.js']
+        extensions: ['.ts', '.js', '.json']
     }
 }

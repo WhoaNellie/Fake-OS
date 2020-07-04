@@ -14,6 +14,7 @@
   },
   "homepage": "https://github.com/WhoaNellie/Fake-OS#readme",
   "dependencies": {
+    "json-loader": "^0.5.7",
     "phaser": "^3.23.0"
   },
   "scripts": {
