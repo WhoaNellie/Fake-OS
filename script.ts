@@ -106,7 +106,11 @@ class Bubble extends Phaser.GameObjects.Container{
             msgX = 0;
         }
 
-        let chatMsg = scene.add.text(msgX, 0, msg, { fontFamily: 'Helvetica', fontSize: '40px' });
+        let style = { fontFamily: 'Helvetica', fontSize: '40px', fill: 'white', align: 'left'};
+
+        let chatMsg = new Phaser.GameObjects.Text(scene, msgX, 0, msg, style);
+        let brokenStr = chatMsg.basicWordWrap(msg, chatMsg.context, 400);
+        chatMsg.setText(brokenStr);
         this.add(chatMsg);
     }
 }
