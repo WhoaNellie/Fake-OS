@@ -96,7 +96,7 @@ class Bubble extends Phaser.GameObjects.Container{
         super(scene, x, y);
         scene.add.existing(this);
 
-        let bubble = scene.add.image(x,y,texture);
+        let bubble = scene.add.image(x,0,texture);
         this.add(bubble);
 
         let msgX;
@@ -108,7 +108,7 @@ class Bubble extends Phaser.GameObjects.Container{
 
         let style = { fontFamily: 'Helvetica', fontSize: '40px', fill: 'white', align: 'left'};
 
-        let chatMsg = new Phaser.GameObjects.Text(scene, msgX, 0, msg, style);
+        let chatMsg = new Phaser.GameObjects.Text(scene, msgX, -50, msg, style);
         let brokenStr = chatMsg.basicWordWrap(msg, chatMsg.context, 400);
         chatMsg.setText(brokenStr);
         this.add(chatMsg);
@@ -142,12 +142,10 @@ class Scene extends Phaser.Scene {
         let chatWnd = new Wnd(this, 800, 500, "Chat With Me");
         let folderWnd = new Wnd(this, 850, 450, "File Explorer");
 
-        let chats = this.add.container(600,800);
+        let chats = this.add.container(600,500);
         let chatsObjs = [];
-        let left = this.add.image(0,0,'left');
-        let right = this.add.image(100, 200, 'right');
         for(let i = chatsArr.length - 1; i > 0; i--){
-            let y = 100 - (100 * (chatsArr.length - i));
+            let y = 100 - (100 * (chatsArr.length - 2*i));
             let x;
             let texture;
             if(chatsArr[i].from === "you"){
