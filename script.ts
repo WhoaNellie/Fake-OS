@@ -143,7 +143,6 @@ class Scene extends Phaser.Scene {
         let folderWnd = new Wnd(this, 850, 450, "File Explorer");
 
         let chats = this.add.container(600,500);
-        let chatsObjs = [];
         for(let i = chatsArr.length - 1; i > 0; i--){
             let y = 100 - (100 * (chatsArr.length - 2*i));
             let x;
@@ -158,7 +157,14 @@ class Scene extends Phaser.Scene {
             let chat = new Bubble(this,x, y, texture, chatsArr[i].msg);
             chats.add(chat);
         }
+        let scrollArea = new Phaser.GameObjects.Rectangle(this, 200, -50, 1000, 900, 0xffffff, 99);
+        scrollArea.setInteractive();
+        chats.add(scrollArea);
         chats.setScale(0.85);
+        chats.setDepth(3);
+        scrollArea.on('wheel', function(){
+            console.log('wheel');
+        }, this)
         
         windows.add([chatWnd, folderWnd]);
         let chat:Icon = new Icon(this, 100, 100,'chat', highlight, chatWnd);
