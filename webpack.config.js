@@ -9,7 +9,7 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.ts|\.js/,
+                test: /\.ts|\.js$/,
                 loader: 'ts-loader',
                 exclude: /node_modules/
             },
@@ -19,7 +19,7 @@ module.exports = {
         contentBase: __dirname,
         watchContentBase: true,
         publicPath: '/dist/',
-        port: 8000
+        port: 3000
     },
     resolve: {
         extensions: ['.ts', '.js', '.json']

@@ -1,6 +1,8 @@
 let click = 0;
 let draggedItem;
-import chatsArr from './chats.js';
+
+import chatArr from './chats';
+
 
 class Icon extends Phaser.GameObjects.Image{
     constructor(scene:Scene, x:number, y:number, texture:string, highlight:Phaser.GameObjects.Rectangle, wnd){
@@ -145,35 +147,33 @@ class Scene extends Phaser.Scene {
         let chatWnd = new Wnd(this, 800, 500, "Chat With Me");
         let folderWnd = new Wnd(this, 850, 450, "File Explorer");
 
-        let chats = this.add.container(600,-100*chatsArr.length + 500);
-        for(let i = chatsArr.length - 1; i > -1; i--){
-            let y = 100 - (100 * (chatsArr.length - 2*i));
+        console.log(chatArr);
+        let chats = this.add.container(600,-100*chatArr.length + 500);
+        for(let i = chatArr.length - 1; i > -1; i--){
+            let y = 100 - (100 * (chatArr.length - 2*i));
             let x;
             let texture;
-            if(chatsArr[i].from === "you"){
+            if(chatArr[i].from === "you"){
                 x = 200;
                 texture = 'right';
             }else{
                 x = 0;
                 texture = 'left';
             }
-            let chat = new Bubble(this,x, y, texture, chatsArr[i].msg);
+            let chat = new Bubble(this,x, y, texture, chatArr[i].msg);
             chats.add(chat);
         }
-        let scrollArea = new Phaser.GameObjects.Rectangle(this, 200,100*chatsArr.length - 50, 1000, 800, 0xffffff, 99);
+        let scrollArea = new Phaser.GameObjects.Rectangle(this, 200,100*chatArr.length - 50, 1000, 800, 0xffffff, 99);
         scrollArea.setInteractive();
         chats.add(scrollArea);
         scrollArea.on('wheel', function(pointer){
             if(
-                !((-100*chatsArr.length + 350 > scrollArea.y) && (pointer.deltaY > 0)) && 
-                !((100*chatsArr.length < scrollArea.y) && (pointer.deltaY < 0))
+                !((-100*chatArr.length + 350 > scrollArea.y) && (pointer.deltaY > 0)) && 
+                !((100*chatArr.length < scrollArea.y) && (pointer.deltaY < 0))
             ){
                 let change = pointer.deltaY*0.5;
                 scrollArea.setY(scrollArea.y - change);
                 chats.setY(chats.y + change);
-                // let bub = chats.getAt(0);
-                // // @ts-ignore
-                // let img = bub.getAt(0);
             }
         }, this)
         
