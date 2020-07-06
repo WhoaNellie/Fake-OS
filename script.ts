@@ -98,9 +98,6 @@ class Bubble extends Phaser.GameObjects.Container{
         super(scene, x, y);
         scene.add.existing(this);
 
-        let bubble = scene.add.image(x,0,texture);
-        this.add(bubble);
-
         let msgX;
         let style;
         if(texture === 'left'){
@@ -111,13 +108,27 @@ class Bubble extends Phaser.GameObjects.Container{
             msgX = 0;
         }
 
-        
-
-        let chatMsg = new Phaser.GameObjects.Text(scene, msgX, -50, msg, style);
+        let chatMsg = new Phaser.GameObjects.Text(scene, msgX, 0, msg, style);
         let brokenStr = chatMsg.basicWordWrap(msg, chatMsg.context, 400);
         chatMsg.setText(brokenStr);
+        let lines = brokenStr.split("\n").length;
+        this.lines = lines;
+
+        let top = scene.add.image(x,-10,`${texture}-top`);
+        this.add(top);
+
+        for(let i = 0; i < lines + 1; i++){
+            let middle = scene.add.image(x,40*i + 40,`${texture}-middle`);
+            this.add(middle);
+        }
+
+        let bottom = scene.add.image(x,40*lines + 80,`${texture}-bottom`);
+        this.add(bottom);
+        // let bubble = scene.add.image(x,0,texture);
+        // this.add(bubble);
         this.add(chatMsg);
     }
+    lines = 1;
 }
 
 class Scene extends Phaser.Scene {
@@ -129,7 +140,13 @@ class Scene extends Phaser.Scene {
         this.load.image('close', '../assets/x.png');
         this.load.image('bar', '../assets/bar.png');
         this.load.image('left', '../assets/left-full.png');
+        this.load.image('left-top', '../assets/left-top.png');
+        this.load.image('left-middle', '../assets/left-middle.png');
+        this.load.image('left-bottom', '../assets/left-bottom.png');
         this.load.image('right', '../assets/right-full.png');
+        this.load.image('right-top', '../assets/right-top.png');
+        this.load.image('right-middle', '../assets/right-middle.png');
+        this.load.image('right-bottom', '../assets/right-bottom.png');
     }
 
     create(){
@@ -147,10 +164,9 @@ class Scene extends Phaser.Scene {
         let chatWnd = new Wnd(this, 800, 500, "Chat With Me");
         let folderWnd = new Wnd(this, 850, 450, "File Explorer");
 
-        console.log(chatArr);
-        let chats = this.add.container(600,-100*chatArr.length + 500);
+        let chats = this.add.container(600,-100*chatArr.length + 350);
         for(let i = chatArr.length - 1; i > -1; i--){
-            let y = 100 - (100 * (chatArr.length - 2*i));
+            let y = 500 - (100 * (chatArr.length - 2*i));
             let x;
             let texture;
             if(chatArr[i].from === "you"){
@@ -163,15 +179,15 @@ class Scene extends Phaser.Scene {
             let chat = new Bubble(this,x, y, texture, chatArr[i].msg);
             chats.add(chat);
         }
-        let scrollArea = new Phaser.GameObjects.Rectangle(this, 200,100*chatArr.length - 50, 1000, 800, 0xffffff, 99);
+        let scrollArea = new Phaser.GameObjects.Rectangle(this, 200,100*chatArr.length + 100, 1000, 800, 0xcfcfcf, 99.5);
         scrollArea.setInteractive();
         chats.add(scrollArea);
         scrollArea.on('wheel', function(pointer){
             if(
-                !((-100*chatArr.length + 350 > scrollArea.y) && (pointer.deltaY > 0)) && 
-                !((100*chatArr.length < scrollArea.y) && (pointer.deltaY < 0))
+                !((-100*chatArr.length + 750 > scrollArea.y) && (pointer.deltaY < 0)) && 
+                !((100*chatArr.length < scrollArea.y) && (pointer.deltaY > 0))
             ){
-                let change = pointer.deltaY*0.5;
+                let change = -pointer.deltaY*0.5;
                 scrollArea.setY(scrollArea.y - change);
                 chats.setY(chats.y + change);
             }
