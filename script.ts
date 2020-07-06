@@ -100,13 +100,16 @@ class Bubble extends Phaser.GameObjects.Container{
         this.add(bubble);
 
         let msgX;
+        let style;
         if(texture === 'left'){
+            style = { fontFamily: 'Helvetica', fontSize: '40px', fill: 'white', align: 'left'};
             msgX = -180;
         }else{
+            style = { fontFamily: 'Helvetica', fontSize: '40px', fill: 'black', align: 'left'};
             msgX = 0;
         }
 
-        let style = { fontFamily: 'Helvetica', fontSize: '40px', fill: 'white', align: 'left'};
+        
 
         let chatMsg = new Phaser.GameObjects.Text(scene, msgX, -50, msg, style);
         let brokenStr = chatMsg.basicWordWrap(msg, chatMsg.context, 400);
@@ -142,7 +145,7 @@ class Scene extends Phaser.Scene {
         let chatWnd = new Wnd(this, 800, 500, "Chat With Me");
         let folderWnd = new Wnd(this, 850, 450, "File Explorer");
 
-        let chats = this.add.container(600,500);
+        let chats = this.add.container(600,-100*chatsArr.length + 500);
         for(let i = chatsArr.length - 1; i > -1; i--){
             let y = 100 - (100 * (chatsArr.length - 2*i));
             let x;
@@ -157,13 +160,21 @@ class Scene extends Phaser.Scene {
             let chat = new Bubble(this,x, y, texture, chatsArr[i].msg);
             chats.add(chat);
         }
-        let scrollArea = new Phaser.GameObjects.Rectangle(this, 200, -50, 1000, 800, 0xffffff, 99);
+        let scrollArea = new Phaser.GameObjects.Rectangle(this, 200,100*chatsArr.length - 50, 1000, 800, 0xffffff, 99);
         scrollArea.setInteractive();
         chats.add(scrollArea);
-        scrollArea.on('wheel', function(pointer, gameObjects, deltaX, deltaY, deltaZ){
-            let change = pointer.deltaY*0.5;
-            scrollArea.setY(scrollArea.y - change);
-            chats.setY(chats.y + change);
+        scrollArea.on('wheel', function(pointer){
+            if(
+                !((-100*chatsArr.length + 350 > scrollArea.y) && (pointer.deltaY > 0)) && 
+                !((100*chatsArr.length < scrollArea.y) && (pointer.deltaY < 0))
+            ){
+                let change = pointer.deltaY*0.5;
+                scrollArea.setY(scrollArea.y - change);
+                chats.setY(chats.y + change);
+                // let bub = chats.getAt(0);
+                // // @ts-ignore
+                // let img = bub.getAt(0);
+            }
         }, this)
         
         windows.add([chatWnd, folderWnd]);
